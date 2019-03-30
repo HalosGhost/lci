@@ -52,8 +52,12 @@
 ':'	= Cons;
 '++'	= Append;
 ','	= Pair;
-'..'	= \n.\m.(m-n) (\l.(Pred (Head l)):l) m:Nil;
+'..'	= \n.\m.If (n > m) (Reverse (Range m n)) (Reverse (Reverse (Range n m)));
 
+# --- Miscellaneous Utilities -----------------------------------------
+
+Flip = \f.\x.\y.f y x;
+Compose = \f.\g.\x.f (g x);
 
 # --- Fixed point combinators -----------------------------------------
 
@@ -92,11 +96,14 @@ Snd = \z.z False;
 
 # --- List construction -----------------------------------------------
 
-Cons = \x.\y.\s.s x y;
-Nil = \x.True;
-IsNil = \p.p \x.\y.False;
-Head = \p.p True;
-Tail = \p.p False;
+Cons  = \h.\t.\c.\n.c h (t c n);
+Nil   = False;
+IsNil = \p.p (\h.\t.False) True;
+Head  = \p.p True False;
+Tail  = \l.\c.\n.l (\h.\t.\g.g h (t c)) (\t.n) False;
+
+Foldr = \f.\z.\l.l f z;
+Foldl = \f.\z.\l.Foldr (\x.\g.\a.g (f a x)) (\x.x) l z;
 
 # --- Infinite recursion ----------------------------------------------
 
@@ -127,35 +134,24 @@ Series = \n.
 G = \n.
 	n + (Series n-1);
 
-
 # --- Basic list functions --------------------------------------------
+
+Append = Flip (Foldr ':');
+Copy = Foldr ':' Nil;
+Drop = \n.n Tail;
+
+Length = Foldr (\c.\n.n + 1) 0;
+Member = \e.Any ('==' e);
+
+Product = Foldl '*' 1;
+Range = \n.\m.Take ((Succ m) - n) (Nats n);
+Reverse = Foldl (Flip ':') Nil;
+Sum = Foldl '+' 0;
 
 ListEqual = \l1.\l2.
 	If (IsNil l1)
 		(IsNil l2)
 		(Head l1)==(Head l2) && (ListEqual (Tail l1) (Tail l2));
-
-Length = \l.
-	If (IsNil l)
-		0
-		(Succ (Length (Tail l)));
-
-Member = \x.\l.
-	If (IsNil l)
-		False
-		(If x == (Head l)
-			True
-			(Member x (Tail l)));
-
-Append = \l1.\l2.
-	If (IsNil l1)
-		l2
-		(Head l1):(Append (Tail l1) l2);
-
-Reverse = \l.
-	If (IsNil l)
-		Nil
-		(Reverse (Tail l)) ++ (Head l):Nil;
 
 Zip = \l1.\l2.
 	If (IsNil l1) || (IsNil l2)
@@ -167,34 +163,14 @@ Combine = \l1.\l2.
 		Nil
 		(Map (Pair (Head l1)) l2) ++ (Combine (Tail l1) l2);
 
-Sum = \l.
-	If (IsNil l)
-		0
-		(Head l) + (Sum (Tail l));
-
 Take = \n.\l.
 	If (IsZero n)
 		Nil
 		(Head l):(Take (Pred n) (Tail l));
 
-
 # --- High order functions --------------------------------------------
 
-Map = \f.\l.
-	If (IsNil l)
-		Nil
-		(f (Head l)):(Map f (Tail l));
-
-Filter = \f.\l.
-	If (IsNil l)
-		Nil
-		(If (f (Head l))
-			(Head l):(Filter f (Tail l))
-			(Filter f (Tail l)));
-
-All = \f.\l.
-	If (IsNil l)
-		True
-		(f (Head l)) && (All f (Tail l));
-
-
+All = \p.Foldr (Compose '&&' p) True;
+Any = \p.Foldr (Compose '||' p) False;
+Filter = \f.Foldr (\h.\t.((Compose (\p.p ':' Nil) f) h) h t) Nil;
+Map = \f.Foldr (Compose ':' f) Nil;
