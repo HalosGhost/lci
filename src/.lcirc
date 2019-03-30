@@ -54,23 +54,24 @@
 ','	= Pair;
 '..'	= \n.\m.(m-n) (\l.(Pred (Head l)):l) m:Nil;
 
-# --- Combinator Calculi ----------------------------------------------
+# --- Combinatory Logic -----------------------------------------------
 
-# Iota Iota
 I = \x.x;
-
-# Iota I
 K = \x.\y.x;
-
-# Iota K
 S = \x.\y.\z.x z (y z);
 
-Iota = \f.f S K;
+B = \x.\y.\z.x (y z);
+W = \x.\y.x y y;
+C = \x.\y.\z.(x y) z;
 
-# --- Fixed point combinators -----------------------------------------
+U = \x.\y.y (x x y);
+
+Omega = \x.x x;
 
 Y = \f.(\x.f(x x))(\x.f(x x));
-Theta = (\x.\y.y (x x y))(\x.\y.y (x x y));
+Theta = U U;
+
+Iota = \f.f S K;
 
 # --- Logical functions -----------------------------------------------
 
