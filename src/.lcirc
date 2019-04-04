@@ -6,64 +6,64 @@
 
 
 # Operator declaration. Must be in the form
-#		? DefOp 'oper' precedence associativity
+#  ? DefOp 'oper' precedence associativity
 
-? DefOp '~'		100 yfx;			# Enforces call-by-value (used internally)
+? DefOp '~' 100 yfx;   # Enforces call-by-value (used internally)
 
-? DefOp '&&'	80 yfx;			# Logical and
-? DefOp '||'	80 yfx;			# Logical or
-? DefOp '^^'	80 yfx;			# Logical xor
-? DefOp '~&'	80 yfx;			# Logical nand
-? DefOp '~|'	80 yfx;			# Logical nor
-? DefOp '~^'	80 yfx;			# Logical nxor
+? DefOp '&&' 80 yfx;   # Logical and
+? DefOp '||' 80 yfx;   # Logical or
+? DefOp '^^' 80 yfx;   # Logical xor
+? DefOp '~&' 80 yfx;   # Logical nand
+? DefOp '~|' 80 yfx;   # Logical nor
+? DefOp '~^' 80 yfx;   # Logical nxor
 
-? DefOp '<'		70 xfx;			# Less than
-? DefOp '<='	70 xfx;			# Less or equal
-? DefOp '=='	70 xfx;			# Equal
-? DefOp '!='	70 xfx;			# Not equal
-? DefOp '>='	70 xfx;			# Greater or equal
-? DefOp '>'		70 xfx;			# Greater than
+? DefOp '<'  70 xfx;   # Less than
+? DefOp '<=' 70 xfx;   # Less or equal
+? DefOp '==' 70 xfx;   # Equal
+? DefOp '!=' 70 xfx;   # Not equal
+? DefOp '>=' 70 xfx;   # Greater or equal
+? DefOp '>'  70 xfx;   # Greater than
 
-? DefOp '++'	60 xfy;			# Append lists
-? DefOp ':'		60 xfy;			# Construct list (Head:Tail)
+? DefOp '++' 60 xfy;   # Append lists
+? DefOp ':'  60 xfy;   # Construct list (Head:Tail)
 
-? DefOp ','		55 xfx;			# Construct ordered pair (a,b)
-? DefOp '..'	55 xfx;			# n..m = [n,n+1,...,m]
+? DefOp ','  55 xfx;   # Construct ordered pair (a,b)
+? DefOp '..' 55 xfx;   # n..m = [n,n+1,...,m]
 
-? DefOp '+'		50 yfx;			# Add
-? DefOp '-'		50 yfx;			# Monus
+? DefOp '+'  50 yfx;   # Add
+? DefOp '-'  50 yfx;   # Monus
 
-? DefOp '*'		40 yfx;			# Multiply
-? DefOp '/'		40 yfx;			# Integer division
+? DefOp '*'  40 yfx;   # Multiply
+? DefOp '/'  40 yfx;   # Integer division
 
-? DefOp '**'	35 yfx;			# Exponential
+? DefOp '**' 35 yfx;   # Exponential
 
 # Operator definition.
 
-'&&'	= And;
-'||'	= Or;
-'^^'	= Xor;
-'~&'	= Nand;
-'~|'	= Nor;
-'~^'	= Nxor;
+'&&' = And;
+'||' = Or;
+'^^' = Xor;
+'~&' = Nand;
+'~|' = Nor;
+'~^' = Nxor;
 
-'=='	= EQ;
-'!='	= NE;
-'>='	= GE;
-'<='	= LE;
-'>'	= GT;
-'<'	= LT;
+'==' = EQ;
+'!=' = NE;
+'>=' = GE;
+'<=' = LE;
+'>' = GT;
+'<' = LT;
 
-'+'	= Add;
-'-'	= Monus;
-'*'	= Multiply;
-'/'	= Divide;
-'**'	= Power;
+'+' = Add;
+'-' = Monus;
+'*' = Multiply;
+'/' = Divide;
+'**' = Power;
 
-':'	= Cons;
-'++'	= Append;
-','	= Pair;
-'..'	= Range;
+':' = Cons;
+'++' = Append;
+',' = Pair;
+'..' = Range;
 
 # --- Combinatory Logic -----------------------------------------------
 
@@ -86,8 +86,8 @@ Iota = \f.f S K;
 
 # --- Logical functions -----------------------------------------------
 
-True	= K;
-False	= 0;
+True = K;
+False = 0;
 Not = \z.z False True;
 
 And = \x.\y.x y x;
@@ -102,7 +102,7 @@ If = \z.\x.\y.z x y;
 # --- Arithmetic functions --------------------------------------------
 
 Succ = \n.\f.\x.n f (f x);
-Pred = \x.\y.\z.x (\p.\q.q (p y)) (\y.z) (\x.x);
+Pred = \x.\y.\z.x (\p.\q.q (p y)) (\y.z) I;
 
 Add = \n.\m.\f.\x.n f (m f x);
 Monus = \a.\b.b Pred a;
@@ -147,12 +147,12 @@ Nats = \n.n:(Nats (Succ n));
 
 #using definition
 Ack = \m.\n.
-	If (IsZero m)
-		n+1
-		(If (IsZero n)
-			(Ack m-1 1)
-			(Ack m-1 ~(Ack m n-1))
-		);
+ If (IsZero m)
+  n+1
+  (If (IsZero n)
+   (Ack m-1 1)
+   (Ack m-1 ~(Ack m n-1))
+  );
 
 #using primitive recursion on high order function
 Ack2 = \p.(p (\a.\q.(a (q a 1))) Succ);
@@ -160,77 +160,77 @@ Ack2 = \p.(p (\a.\q.(a (q a 1))) Succ);
 # --- Mutually recursive functions ------------------------------------
 
 Series = \n.
-	If (IsZero n)
-		0
-		(G n);
+ If (IsZero n)
+  0
+  (G n);
 
 G = \n.
-	n + (Series n-1);
+ n + (Series n-1);
 
 # --- Basic list functions --------------------------------------------
 
 ListEqual = \l1.\l2.
-	If (IsNil l1)
-		(IsNil l2)
-		(Head l1)==(Head l2) && (ListEqual (Tail l1) (Tail l2));
+ If (IsNil l1)
+  (IsNil l2)
+  (Head l1)==(Head l2) && (ListEqual (Tail l1) (Tail l2));
 
 Length = \l.
-	If (IsNil l)
-		0
-		(Succ (Length (Tail l)));
+ If (IsNil l)
+  0
+  (Succ (Length (Tail l)));
 
 Member = \x.\l.
-	If (IsNil l)
-		False
-		(If x == (Head l)
-			True
-			(Member x (Tail l)));
+ If (IsNil l)
+  False
+  (If x == (Head l)
+   True
+   (Member x (Tail l)));
 
 Append = \l1.\l2.
-	If (IsNil l1)
-		l2
-		(Head l1):(Append (Tail l1) l2);
+ If (IsNil l1)
+  l2
+  (Head l1):(Append (Tail l1) l2);
 
 Reverse = \l.
-	If (IsNil l)
-		Nil
-		(Reverse (Tail l)) ++ (Head l):Nil;
+ If (IsNil l)
+  Nil
+  (Reverse (Tail l)) ++ (Head l):Nil;
 
 Zip = \l1.\l2.
-	If (IsNil l1) || (IsNil l2)
-		Nil
-		((Head l1),(Head l2)):(Zip (Tail l1) (Tail l2));
+ If (IsNil l1) || (IsNil l2)
+  Nil
+  ((Head l1),(Head l2)):(Zip (Tail l1) (Tail l2));
 
 Combine = \l1.\l2.
-	If (IsNil l1)
-		Nil
-		(Map (Pair (Head l1)) l2) ++ (Combine (Tail l1) l2);
+ If (IsNil l1)
+  Nil
+  (Map (Pair (Head l1)) l2) ++ (Combine (Tail l1) l2);
 
 Sum = \l.
-	If (IsNil l)
-		0
-		(Head l) + (Sum (Tail l));
+ If (IsNil l)
+  0
+  (Head l) + (Sum (Tail l));
 
 Take = \n.\l.
-	If (IsZero n)
-		Nil
-		(Head l):(Take (Pred n) (Tail l));
+ If (IsZero n)
+  Nil
+  (Head l):(Take (Pred n) (Tail l));
 
 # --- High order functions --------------------------------------------
 
 Map = \f.\l.
-	If (IsNil l)
-		Nil
-		(f (Head l)):(Map f (Tail l));
+ If (IsNil l)
+  Nil
+  (f (Head l)):(Map f (Tail l));
 
 Filter = \f.\l.
-	If (IsNil l)
-		Nil
-		(If (f (Head l))
-			(Head l):(Filter f (Tail l))
-			(Filter f (Tail l)));
+ If (IsNil l)
+  Nil
+  (If (f (Head l))
+   (Head l):(Filter f (Tail l))
+   (Filter f (Tail l)));
 
 All = \f.\l.
-	If (IsNil l)
-		True
-		(f (Head l)) && (All f (Tail l));
+ If (IsNil l)
+  True
+  (f (Head l)) && (All f (Tail l));
