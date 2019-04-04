@@ -12,13 +12,17 @@
 
 ? DefOp '&&'	80 yfx;			# Logical and
 ? DefOp '||'	80 yfx;			# Logical or
+? DefOp '^^'	80 yfx;			# Logical xor
+? DefOp '~&'	80 yfx;			# Logical nand
+? DefOp '~|'	80 yfx;			# Logical nor
+? DefOp '~^'	80 yfx;			# Logical nxor
 
 ? DefOp '<'		70 xfx;			# Less than
 ? DefOp '<='	70 xfx;			# Less or equal
-? DefOp '>'		70 xfx;			# Greater than
-? DefOp '>='	70 xfx;			# Greater or equal
 ? DefOp '=='	70 xfx;			# Equal
 ? DefOp '!='	70 xfx;			# Not equal
+? DefOp '>='	70 xfx;			# Greater or equal
+? DefOp '>'		70 xfx;			# Greater than
 
 ? DefOp '++'	60 xfy;			# Append lists
 ? DefOp ':'		60 xfy;			# Construct list (Head:Tail)
@@ -38,21 +42,28 @@
 
 '&&'	= And;
 '||'	= Or;
-'=='	= Equal;
-'!='	= \a.\b.Not (a == b);
-'>='	= Geq;
-'<='	= Leq;
-'>'	= \a.\b.Not (a <= b);
-'<'	= \a.\b.Not (a >= b);
+'^^'	= Xor;
+'~&'	= Nand;
+'~|'	= Nor;
+'~^'	= Nxor;
+
+'=='	= EQ;
+'!='	= NE;
+'>='	= GE;
+'<='	= LE;
+'>'	= GT;
+'<'	= LT;
+
 '+'	= Add;
 '-'	= Monus;
-'*'	= Mult;
-'/'	= \n.\m.If (n < m) 0 1+(n-m)/m;
-'**'	= Exp;
+'*'	= Multiply;
+'/'	= Divide;
+'**'	= Power;
+
 ':'	= Cons;
 '++'	= Append;
 ','	= Pair;
-'..'	= \n.\m.(m-n) (\l.(Pred (Head l)):l) m:Nil;
+'..'	= Range;
 
 # --- Combinatory Logic -----------------------------------------------
 
@@ -68,34 +79,49 @@ U = \x.\y.y (x x y);
 
 Omega = \x.x x;
 
-Y = \f.(\x.f(x x))(\x.f(x x));
+Y = \f.(\x.f (x x)) (\x.f (x x));
 Theta = U U;
 
 Iota = \f.f S K;
 
 # --- Logical functions -----------------------------------------------
 
-True	= \x.\y.x;
-False	= \x.\y.y;
+True	= K;
+False	= 0;
 Not = \z.z False True;
-And = \x.\y.(x (y True False) False);
-Or = \x.\y.(x True (y True False));
+
+And = \x.\y.x y x;
+Or = \x.\y.x x y;
+Xor = \x.\y.x (Not y) y;
+Nand = \x.\y.Not (And x y);
+Nor = \x.\y.Not (Or x y);
+Nxor = \x.\y.Not (Xor x y);
+
 If = \z.\x.\y.z x y;
 
 # --- Arithmetic functions --------------------------------------------
 
-Succ = \n.\f.\x.n f(f x);
-Pred = \x.\y.\z.x(\p.\q.q(p y))(\y.z)(\x.x);
-Add = \n.\m.\f.\x.n f(m f x);
-Mult = \n.\m.\f.n(m f);
-Exp = \n.\m.m n;
+Succ = \n.\f.\x.n f (f x);
+Pred = \x.\y.\z.x (\p.\q.q (p y)) (\y.z) (\x.x);
+
+Add = \n.\m.\f.\x.n f (m f x);
 Monus = \a.\b.b Pred a;
 
-#IsZero = \x.x (\x.\z.z False x) (\x.x) True;
+Multiply = \n.\m.\f.n (m f);
+Divide = \n.\m.(LE n m) 0 (1 + (Divide (n - m) m));
+
+Power = \n.\m.m n;
+
+# --- Comparison functions / Predicates -------------------------------
+
 IsZero = \n.n (\x.False) True;
-Equal = \a.\b.(IsZero a-b) && (IsZero b-a);
-Leq = \a.\b.IsZero (Monus a b);
-Geq = \a.\b.IsZero (Monus b a);
+
+LT = \a.\b.Not (GE a b);
+LE = \a.\b.IsZero (Monus a b);
+EQ = \a.\b.And (GE a b) (LE a b);
+NE = \a.\b.Not (EQ a b);
+GE = \a.\b.IsZero (Monus b a);
+GT = \a.\b.Not (LE a b);
 
 # --- Pairs -----------------------------------------------------------
 
@@ -110,6 +136,7 @@ Nil = \x.True;
 IsNil = \p.p \x.\y.False;
 Head = \p.p True;
 Tail = \p.p False;
+Range = \n.\m.(m-n) (\l.(Pred (Head l)):l) m:Nil;
 
 # --- Infinite recursion ----------------------------------------------
 
@@ -139,7 +166,6 @@ Series = \n.
 
 G = \n.
 	n + (Series n-1);
-
 
 # --- Basic list functions --------------------------------------------
 
@@ -190,7 +216,6 @@ Take = \n.\l.
 		Nil
 		(Head l):(Take (Pred n) (Tail l));
 
-
 # --- High order functions --------------------------------------------
 
 Map = \f.\l.
@@ -209,5 +234,3 @@ All = \f.\l.
 	If (IsNil l)
 		True
 		(f (Head l)) && (All f (Tail l));
-
-
