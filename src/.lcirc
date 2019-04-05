@@ -10,6 +10,8 @@
 
 ? DefOp '~' 100 yfx;   # Enforces call-by-value (used internally)
 
+? DefOp '!!' 90 yfx;   # List indexing (index origin: 1)
+
 ? DefOp '&&' 80 yfx;   # Logical and
 ? DefOp '||' 80 yfx;   # Logical or
 ? DefOp '^^' 80 yfx;   # Logical xor
@@ -28,7 +30,7 @@
 ? DefOp ':'  60 xfy;   # Construct list (Head:Tail)
 
 ? DefOp ','  55 xfx;   # Construct ordered pair (a,b)
-? DefOp '..' 55 xfx;   # n..m = [n,n+1,...,m]
+? DefOp '..' 55 xfx;   # n..m = [n,n+1,...,m] (or [n, n-1,...,m])
 
 ? DefOp '+'  50 yfx;   # Add
 ? DefOp '-'  50 yfx;   # Monus
@@ -40,6 +42,8 @@
 
 # Operator definition.
 
+'!!' = Index;
+
 '&&' = And;
 '||' = Or;
 '^^' = Xor;
@@ -47,12 +51,12 @@
 '~|' = Nor;
 '~^' = Nxor;
 
+'<' = LT;
+'<=' = LE;
 '==' = EQ;
 '!=' = NE;
 '>=' = GE;
-'<=' = LE;
 '>' = GT;
-'<' = LT;
 
 '+' = Add;
 '-' = Monus;
@@ -84,6 +88,11 @@ Theta = U U;
 
 Iota = \f.f S K;
 
+# --- Miscellaneous Utilities -----------------------------------------
+
+Flip = \f.\x.\y.f y x;
+Compose = B;
+
 # --- Logical functions -----------------------------------------------
 
 True = K;
@@ -107,10 +116,16 @@ Pred = \x.\y.\z.x (\p.\q.q (p y)) (\y.z) I;
 Add = \n.\m.\f.\x.n f (m f x);
 Monus = \a.\b.b Pred a;
 
-Multiply = \n.\m.\f.n (m f);
-Divide = \n.\m.(LE n m) 0 (1 + (Divide (n - m) m));
+Multiply = Compose;
+#Divide = \n.\m.(LE n m) 0 (1 + (Divide (n - m) m));
+Divide = \n.\m.Length (TakeWhile (\i.i <= n) (Scanl '+' m (Replicate (Pred n) m)));
 
 Power = \n.\m.m n;
+
+Factorial = \n.Product ~ (2..n);
+
+Min = \n.\m.(n < m) n m;
+Max = \n.\m.(n > m) n m;
 
 # --- Comparison functions / Predicates -------------------------------
 
@@ -129,14 +144,31 @@ Pair = \x.\y.\z.z x y;
 Fst = \z.z True;
 Snd = \z.z False;
 
+## --- List construction -----------------------------------------------
+#
+#Cons = \x.\y.\s.s x y;
+#Nil = \x.True;
+#IsNil = \p.p \x.\y.False;
+#Head = \p.p True;
+#Tail = \p.p False;
+#Range = \n.\m.(m-n) (\l.(Pred (Head l)):l) m:Nil;
+
 # --- List construction -----------------------------------------------
 
-Cons = \x.\y.\s.s x y;
-Nil = \x.True;
-IsNil = \p.p \x.\y.False;
-Head = \p.p True;
-Tail = \p.p False;
-Range = \n.\m.(m-n) (\l.(Pred (Head l)):l) m:Nil;
+Cons  = \h.\t.\c.\n.c h (t c n);
+Nil   = False;
+
+IsNil = \p.p (\h.\t.False) True;
+
+Head  = \p.p True False;
+Tail  = \l.\c.\n.l (\h.\t.\g.g h (t c)) (\t.n) False;
+Index = \l.\n.Head (Drop (Pred n) l);
+
+Foldr = \f.\z.\l.l f z;
+Foldl = \f.\z.\l.Foldr (\x.\g.\a.g (f a x)) (\x.x) l z;
+
+Scanr = \f.\z.Foldr (\g.\a.(f g (Head a)) : a) (z : Nil);
+Scanl = \f.\z.\l.Reverse (Foldr (\g.\a.(f g (Head a)) : a) (z : Nil) (Reverse l));
 
 # --- Infinite recursion ----------------------------------------------
 
@@ -169,68 +201,33 @@ G = \n.
 
 # --- Basic list functions --------------------------------------------
 
-ListEqual = \l1.\l2.
- If (IsNil l1)
-  (IsNil l2)
-  (Head l1)==(Head l2) && (ListEqual (Tail l1) (Tail l2));
+Append = \l.\r.Foldr ':' r l;
+Combine = \l.\r.Zip (Concat (Map (Replicate (Length l)) l)) (Concat (Replicate (Length r) r));
+Concat = Foldr '++' Nil;
+Copy = Foldr ':' Nil;
+Drop = \n.n Tail;
 
-Length = \l.
- If (IsNil l)
-  0
-  (Succ (Length (Tail l)));
+Length = Foldr (\c.\n.n + 1) 0;
+ListEq = \l.\r.((Length l) == (Length r)) (All (\p.(Fst p) == (Snd p)) (Zip l r)) False;
+Member = \e.Any ('==' e);
 
-Member = \x.\l.
- If (IsNil l)
-  False
-  (If x == (Head l)
-   True
-   (Member x (Tail l)));
+Product = Foldl '*' 1;
+Range = \n.\m.((n < m) I Reverse) (Scanl '+' (Min n m) (Replicate ((Max n m) - (Min n m)) 1));
+Replicate = \n.\e.n (':' e) Nil;
+Reverse = Foldl (Flip ':') Nil;
+Sum = Foldl '+' 0;
+ 
+Take = \n.\l.Reverse (Drop ((Length l) - n) (Reverse l));
 
-Append = \l1.\l2.
- If (IsNil l1)
-  l2
-  (Head l1):(Append (Tail l1) l2);
-
-Reverse = \l.
- If (IsNil l)
-  Nil
-  (Reverse (Tail l)) ++ (Head l):Nil;
-
-Zip = \l1.\l2.
- If (IsNil l1) || (IsNil l2)
-  Nil
-  ((Head l1),(Head l2)):(Zip (Tail l1) (Tail l2));
-
-Combine = \l1.\l2.
- If (IsNil l1)
-  Nil
-  (Map (Pair (Head l1)) l2) ++ (Combine (Tail l1) l2);
-
-Sum = \l.
- If (IsNil l)
-  0
-  (Head l) + (Sum (Tail l));
-
-Take = \n.\l.
- If (IsZero n)
-  Nil
-  (Head l):(Take (Pred n) (Tail l));
+Zip = Foldr (\x.\z.\l.(IsNil l) Nil ((x, (Head l)) : (z (Tail l)))) (\t.False);
 
 # --- High order functions --------------------------------------------
 
-Map = \f.\l.
- If (IsNil l)
-  Nil
-  (f (Head l)):(Map f (Tail l));
+All = \p.Foldr (Compose '&&' p) True;
+Any = \p.Foldr (Compose '||' p) False;
 
-Filter = \f.\l.
- If (IsNil l)
-  Nil
-  (If (f (Head l))
-   (Head l):(Filter f (Tail l))
-   (Filter f (Tail l)));
+Filter = \f.Foldr (\h.\t.((Compose (\p.p ':' Nil) f) h) h t) Nil;
 
-All = \f.\l.
- If (IsNil l)
-  True
-  (f (Head l)) && (All f (Tail l));
+Map = \f.Foldr (Compose ':' f) Nil;
+
+TakeWhile = \f.Foldr ((\p.\x.\t.(p x) (x : t) Nil) f) Nil;
