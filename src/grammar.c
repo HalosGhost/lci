@@ -252,8 +252,8 @@ void procRule2(SYMB_INFO *symb) {
 void procRule3(SYMB_INFO *symb) {
 	int num = 0;
 
-	if(strlen($(0)) > 4)
-		fprintf(stderr, "Error: integers must be in the range 0-9999.\n");
+	if(strlen($(0)) > 5)
+		fprintf(stderr, "Error: naturals must be in the range 0-99999.\n");
 	else
 		num = atoi($(0));
 
