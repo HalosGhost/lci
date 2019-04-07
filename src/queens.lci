@@ -40,7 +40,7 @@ Safe = \p.\n.\m.
 	All Not
 		(Map
 		 	(\p.Check ~ (Fst p) ~ (Snd p) m n)
-			~ (Zip (Nats 1) p)
+			~ (Zip ~ (1..(Length p)) p) #
 		);
 
 
