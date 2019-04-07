@@ -37,6 +37,7 @@
 
 ? DefOp '*'  40 yfx;   # Multiply
 ? DefOp '/'  40 yfx;   # Integer division
+? DefOp '%'  40 yfx;   # Integer modulus
 
 ? DefOp '**' 35 yfx;   # Exponential
 
@@ -62,6 +63,7 @@
 '-' = Monus;
 '*' = Multiply;
 '/' = Divide;
+'%' = Modulus;
 '**' = Power;
 
 ':' = Cons;
@@ -106,7 +108,15 @@ Nand = \x.\y.Not (And x y);
 Nor = \x.\y.Not (Or x y);
 Nxor = \x.\y.Not (Xor x y);
 
-If = \z.\x.\y.z x y;
+# --- Control-Flow Sugar ----------------------------------------------
+
+If = I;
+
+Foldr = \f.\z.\l.l f z;
+Foldl = \f.\z.\l.Foldr (\x.\g.\a.g (f a x)) (\x.x) l z;
+
+Scanr = \f.\z.Foldr (\g.\a.(f g (Head a)) : a) (z : Nil);
+Scanl = \f.\z.\l.Reverse (Foldr (\g.\a.(f g (Head a)) : a) (z : Nil) (Reverse l));
 
 # --- Arithmetic functions --------------------------------------------
 
@@ -117,8 +127,8 @@ Add = \n.\m.\f.\x.n f (m f x);
 Monus = \a.\b.b Pred a;
 
 Multiply = Compose;
-#Divide = \n.\m.(LE n m) 0 (1 + (Divide (n - m) m));
-Divide = \n.\m.Length (TakeWhile (\i.i <= n) (Scanl '+' m (Replicate (Pred n) m)));
+Divide = \n.\m.Length (TakeWhile (\i.i <= n) (Scanl '+' m (Replicate (Succ n - m) m)));
+Modulus = \n.\m.n - (Last (TakeWhile (\i.i <= n) (Scanl '+' m (Replicate (Succ n - m) m))));
 
 Power = \n.\m.m n;
 
@@ -153,7 +163,7 @@ Snd = \z.z False;
 #Tail = \p.p False;
 #Range = \n.\m.(m-n) (\l.(Pred (Head l)):l) m:Nil;
 
-# --- List construction -----------------------------------------------
+# --- List Construction and Elimination -------------------------------
 
 Cons  = \h.\t.\c.\n.c h (t c n);
 Nil   = False;
@@ -164,11 +174,8 @@ Head  = \p.p True False;
 Tail  = \l.\c.\n.l (\h.\t.\g.g h (t c)) (\t.n) False;
 Index = \l.\n.Head (Drop (Pred n) l);
 
-Foldr = \f.\z.\l.l f z;
-Foldl = \f.\z.\l.Foldr (\x.\g.\a.g (f a x)) (\x.x) l z;
-
-Scanr = \f.\z.Foldr (\g.\a.(f g (Head a)) : a) (z : Nil);
-Scanl = \f.\z.\l.Reverse (Foldr (\g.\a.(f g (Head a)) : a) (z : Nil) (Reverse l));
+Init  = \l.Reverse (Drop 1 (Reverse l));
+Last  = Compose Head Reverse;
 
 # --- Infinite recursion ----------------------------------------------
 
