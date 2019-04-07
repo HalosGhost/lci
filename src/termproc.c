@@ -59,7 +59,9 @@ void termPrint(TERM *t, int isMostRight) {
 
 	 case TM_ABSTR:
 		// if the term is a church numeral we print the corresponding number
-		if(readable && (num = termNumber(t)) != -1)
+		if(readable && (num = termBoolean(t)) != -1)
+		    printf("%s", num ? "True" : "False");
+		else if(readable && (num = termNumber(t)) != -1)
 			printf("%d", num);
 		else if(readable && termIsList(t))
 			termPrintList(t);
@@ -440,6 +442,30 @@ int termConv(TERM *t) {
 		assert(0);
 		return -1;
 	}
+}
+
+// termBoolean
+//
+// If term t is a church boolean then return its corresponding boolean, otherwise -1
+
+int termBoolean(TERM *t) {
+	TERM *f, *x, *body;
+	int n = 0;
+
+	// first term must be \f.
+	if(t->type != TM_ABSTR) return -1;
+	f = t->lterm;
+
+	// second term must be \x. with x != f
+	if(t->rterm->type != TM_ABSTR) return -1;
+	x = (t->rterm->lterm);
+	if(strcmp(f->name, x->name) == 0) return -1;
+
+	// recognize term f^n(x), compute n
+	if (t->rterm->rterm->type != TM_VAR) return -1;
+	body = t->rterm->rterm;
+
+	return strcmp(body->name, f->name) == 0;
 }
 
 // termPower
