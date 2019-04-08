@@ -208,7 +208,7 @@ G = \n.
 
 # --- Basic list functions --------------------------------------------
 
-Append = \l.\r.Foldr ':' r l;
+Append = Flip (Foldr ':');
 Combine = \l.\r.Zip (Concat (Map (Replicate (Length l)) l)) (Concat (Replicate (Length r) r));
 Concat = Foldr '++' Nil;
 Copy = Foldr ':' Nil;
@@ -219,7 +219,7 @@ ListEq = \l.\r.((Length l) == (Length r)) (All (\p.(Fst p) == (Snd p)) (Zip l r)
 Member = \e.Any ('==' e);
 
 Product = Foldl '*' 1;
-Range = \n.\m.((n < m) I Reverse) (Scanl '+' (Min n m) (Replicate ((Max n m) - (Min n m)) 1));
+Range = \n.\m.(n < m) (Scanl '+' n (Replicate (m - n) 1)) (Reverse (Scanl '+' m (Replicate (n - m) 1)));
 Replicate = \n.\e.n (':' e) Nil;
 Reverse = Foldl (Flip ':') Nil;
 Sum = Foldl '+' 0;
