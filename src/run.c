@@ -212,7 +212,7 @@ int execSystemCmd(TERM *t) {
 
 		// param 2: precedence
 		par = *--sp;
-		prec = termNumber(par);
+		prec = termNatural(par);
 		if(prec == -1) return -1;
 
 		// param 3: associativity

@@ -61,8 +61,10 @@ void termPrint(TERM *t, int isMostRight) {
 		// if the term is a church numeral we print the corresponding number
 		if(readable && (num = termBoolean(t)) != -1)
 		    printf("%s", num ? "True" : "False");
-		else if(readable && (num = termNumber(t)) != -1)
+		else if(readable && (num = termNatural(t)) != -1)
 			printf("%d", num);
+		else if(readable && termIsPair(t))
+			termPrintPair(t);
 		else if(readable && termIsList(t))
 			termPrintList(t);
 		else {
@@ -517,11 +519,11 @@ TERM *termChurchNum(int n) {
 	return l1;
 }
 
-// termNumber
+// termNatural
 //
 // If term t is a church numeral then return its corresponding number, otherwise -1
 
-int termNumber(TERM *t) {
+int termNatural(TERM *t) {
 	TERM *f, *x, *cur;
 	int n = 0;
 
@@ -545,6 +547,37 @@ int termNumber(TERM *t) {
 			return -1;
 	}
 }	
+
+// termIsPair
+//
+// Returns 1 if t is a Church pair that is of the form
+// \s.s Head Tail
+
+int termIsPair(TERM *t) {
+	TERM *r;
+
+	if(t->type != TM_ABSTR) return 0;
+
+	r = t->rterm;
+	return (r->type == TM_APPL && r->lterm->type == TM_APPL &&
+		r->lterm->lterm->type == TM_VAR &&
+		strcmp(r->lterm->lterm->name, t->lterm->name) == 0);
+}
+
+// termPrintPair
+//
+// Prints a term of the form (A, B). The term must be the encoding of a Pair
+// (termIsPair(t) must return 1).
+
+void termPrintPair(TERM *t) {
+	TERM *r = t->rterm;
+
+	putchar('(');
+	termPrint(r->lterm->rterm, 1);
+	printf(", ");
+	termPrint(r->rterm, 1);
+    putchar(')');
+}
 
 // termIsList
 //
