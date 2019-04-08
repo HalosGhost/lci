@@ -58,11 +58,12 @@ void termPrint(TERM *t, int isMostRight) {
 		break;
 
 	 case TM_ABSTR:
-		// if the term is a church numeral we print the corresponding number
 		if(readable && (num = termBoolean(t)) != -1)
 		    printf("%s", num ? "True" : "False");
 		else if(readable && (num = termNatural(t)) != -1)
 			printf("%d", num);
+		else if(readable && termIsString(t))
+			termPrintString(t);
 		else if(readable && termIsPair(t))
 			termPrintPair(t);
 		else if(readable && termIsList(t))
@@ -579,6 +580,60 @@ void termPrintPair(TERM *t) {
     putchar(')');
 }
 
+// termIsString
+//
+// Returns 1 if t is an encoding of a string that is of the form
+// \s.s Head Tail h Nil: \x.\x.\y.x
+// Head must be a termNatural between 0 and 127
+
+int termIsString(TERM *t) {
+	TERM *r;
+
+	if(t->type != TM_ABSTR) return 0;
+
+	r = t->rterm;
+	switch(r->type) {
+	 case TM_APPL:
+		// check for the form \s.s Head Tail
+		if(r->lterm->type == TM_APPL &&
+			r->lterm->lterm->type == TM_VAR &&
+			termNatural(r->lterm->rterm) >= 0 && termNatural(r->lterm->rterm) <= 127 &&
+			strcmp(r->lterm->lterm->name, t->lterm->name) == 0)
+			return termIsString(r->rterm);
+		break;
+
+	 case TM_ABSTR:
+		// check for the form Nil: \x.\x.\y.x
+		if(r->rterm->type == TM_ABSTR &&
+			r->rterm->rterm->type == TM_VAR &&
+			strcmp(r->rterm->rterm->name, r->lterm->name) == 0)
+			return 1;
+		break;
+
+	 default:
+		;
+	}
+
+	return 0;
+}
+
+// termPrintString
+//
+// Prints a term of the form [A, B, C, ...]. The term must be the encoding of a list
+// (termIsString(t) must return 1).
+
+void termPrintString(TERM *t) {
+	TERM *r;
+
+    putchar('"');
+
+	for(r = t->rterm; r->type == TM_APPL; r = r->rterm->rterm) {
+	    putchar(termNatural(r->lterm->rterm));
+	}
+
+    putchar('"');
+}
+
 // termIsList
 //
 // Returns 1 if t is an encoding of a list, that is of the form
@@ -623,14 +678,14 @@ void termPrintList(TERM *t) {
 	TERM *r;
 	int i = 0;
 
-	printf("[");
+	putchar('[');
 
 	for(r = t->rterm; r->type == TM_APPL; r = r->rterm->rterm) {
 		if(i++ > 0) printf(", ");
 		termPrint(r->lterm->rterm, 1);
 	}
 
-	printf("]");
+	putchar(']');
 }
 
 // termAliasSubst

@@ -38,6 +38,8 @@ TERM *termPower(TERM *f, TERM *a, int pow);
 TERM *termChurchNum(int n);
 int termBoolean(TERM *t);
 int termNatural(TERM *t);
+int termIsString(TERM *t);
+void termPrintString(TERM *t);
 int termIsPair(TERM *t);
 void termPrintPair(TERM *t);
 int termIsList(TERM *t);
