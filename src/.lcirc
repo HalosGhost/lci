@@ -154,14 +154,10 @@ Pair = \x.\y.\z.z x y;
 Fst = \z.z True;
 Snd = \z.z False;
 
-## --- List construction -----------------------------------------------
-#
-#Cons = \x.\y.\s.s x y;
-#Nil = \x.True;
-#IsNil = \p.p \x.\y.False;
-#Head = \p.p True;
-#Tail = \p.p False;
-#Range = \n.\m.(m-n) (\l.(Pred (Head l)):l) m:Nil;
+# --- String Manipulation ---------------------------------------------
+
+Empty = \x.True;
+ToString = Foldr ',' Empty;
 
 # --- List Construction and Elimination -------------------------------
 
