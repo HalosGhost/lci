@@ -61,7 +61,7 @@ void termPrint(TERM *t, int isMostRight) {
 		if(readable && termIdentity(t))
 		    putchar('I');
 		else if(readable && (num = termBoolean(t)) != -1)
-		    printf("%s", num ? "True" : "False");
+		    printf("%s", num ? "True" : "0");
 		else if(readable && (num = termNatural(t)) != -1)
 			printf("%d", num);
 		else if(readable && termIsString(t))
@@ -474,7 +474,7 @@ int termBoolean(TERM *t) {
 	x = (t->rterm->lterm);
 	if(strcmp(f->name, x->name) == 0) return -1;
 
-	// recognize term f^n(x), compute n
+	// third term must be either f or x
 	if (t->rterm->rterm->type != TM_VAR) return -1;
 	body = t->rterm->rterm;
 
