@@ -58,7 +58,9 @@ void termPrint(TERM *t, int isMostRight) {
 		break;
 
 	 case TM_ABSTR:
-		if(readable && (num = termBoolean(t)) != -1)
+		if(readable && termIdentity(t))
+		    putchar('I');
+		else if(readable && (num = termBoolean(t)) != -1)
 		    printf("%s", num ? "True" : "False");
 		else if(readable && (num = termNatural(t)) != -1)
 			printf("%d", num);
@@ -445,6 +447,14 @@ int termConv(TERM *t) {
 		assert(0);
 		return -1;
 	}
+}
+
+// termIdentity
+//
+// Return true or false depending on if term t is the identity function
+
+int termIdentity(TERM *t) {
+    return (t->type == TM_ABSTR && t->rterm->type == TM_VAR && strcmp(t->lterm->name, t->rterm->name) == 0);
 }
 
 // termBoolean

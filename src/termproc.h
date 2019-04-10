@@ -36,6 +36,7 @@ int termConv(TERM *t);
 
 TERM *termPower(TERM *f, TERM *a, int pow);
 TERM *termChurchNum(int n);
+int termIdentity(TERM *t);
 int termBoolean(TERM *t);
 int termNatural(TERM *t);
 int termIsString(TERM *t);
