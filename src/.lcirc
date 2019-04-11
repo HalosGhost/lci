@@ -134,8 +134,8 @@ Power = \n.\m.m n;
 
 Factorial = \n.Product ~ (2..n);
 
-Min = \n.\m.(n < m) n m;
-Max = \n.\m.(n > m) n m;
+Min = \n.\m.(LE n m) n m;
+Max = \n.\m.(LE m n) n m;
 
 # --- Comparison functions / Predicates -------------------------------
 
@@ -212,7 +212,9 @@ Drop = \n.n Tail;
 
 Length = Foldr (\c.\n.n + 1) 0;
 ListEq = \l.\r.((Length l) == (Length r)) (All (\p.(Fst p) == (Snd p)) (Zip l r)) False;
+Maximum = Foldr Max 0;
 Member = \e.Any ('==' e);
+Maximum = \l.Foldr Min (Head l) (Tail l);
 
 Product = Foldl '*' 1;
 Range = \n.\m.(n < m) (Scanl '+' n (Replicate (m - n) 1)) (Reverse (Scanl '+' m (Replicate (n - m) 1)));
