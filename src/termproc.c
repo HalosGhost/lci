@@ -646,37 +646,36 @@ void termPrintString(TERM *t) {
 
 // termIsList
 //
-// Returns 1 if t is an encoding of a list, that is of the form
-// \s.s Head Tail h Nil: \x.\x.\y.x
+// Returns 1 if t is an encoding of a list in foldr-encoding
 
 int termIsList(TERM *t) {
 	TERM *r;
 
+    // match Nil
 	if(t->type != TM_ABSTR) return 0;
+	if(termBoolean(t) == 0) return 1;
 
+    // match single-element list (necessary due to eta-reduction)
 	r = t->rterm;
-	switch(r->type) {
-	 case TM_APPL:
-		// check for the form \s.s Head Tail
-		if(r->lterm->type == TM_APPL &&
-			r->lterm->lterm->type == TM_VAR &&
-			strcmp(r->lterm->lterm->name, t->lterm->name) == 0)
-			return termIsList(r->rterm);
-		break;
+	if(r->type == TM_APPL &&
+	   strcmp(t->lterm->name, r->lterm->name) == 0 &&
+	   r->rterm->type == TM_ABSTR) return 1;
 
-	 case TM_ABSTR:
-		// check for the form Nil: \x.\x.\y.x
-		if(r->rterm->type == TM_ABSTR &&
-			r->rterm->rterm->type == TM_VAR &&
-			strcmp(r->rterm->rterm->name, r->lterm->name) == 0)
-			return 1;
-		break;
+	char * c_name = t->lterm->name;
+	if(!(r->lterm) || !(r->lterm->name)) return 0;
+	char * n_name = r->lterm->name;
 
-	 default:
-		;
-	}
+    r = r->rterm;
+    while(r && r->type == TM_APPL) {
+        if(strcmp(r->lterm->lterm->name, c_name) == 0 && r->lterm->type == TM_APPL && r->lterm->rterm->type == TM_ABSTR) {
+            r = r->rterm;
+            continue;
+        }
 
-	return 0;
+        return 0;
+    }
+
+    return strcmp(r->name, n_name) == 0;
 }
 
 // termPrintList
@@ -685,15 +684,22 @@ int termIsList(TERM *t) {
 // (termIsList(t) must return 1).
 
 void termPrintList(TERM *t) {
-	TERM *r;
+	TERM *r = t->rterm;
 	int i = 0;
 
 	putchar('[');
 
-	for(r = t->rterm; r->type == TM_APPL; r = r->rterm->rterm) {
-		if(i++ > 0) printf(", ");
-		termPrint(r->lterm->rterm, 1);
-	}
+	if(r->type == TM_APPL && strcmp(t->lterm->name, r->lterm->name) == 0 && r->rterm->type == TM_ABSTR) {
+        termPrint(r->rterm, 1);
+	} else {
+        r = r->rterm;
+        while(r && r->type == TM_APPL) {
+            if (i++ > 0) printf(", ");
+            termPrint(r->lterm->rterm, 1);
+            r = r->rterm;
+            continue;
+        }
+    }
 
 	putchar(']');
 }
