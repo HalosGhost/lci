@@ -594,7 +594,7 @@ void termPrintPair(TERM *t) {
 //
 // Returns 1 if t is an encoding of a string that is of the form
 // \s.s Head Tail h Nil: \x.\x.\y.x
-// Head must be a termNatural between 0 and 127
+// Head must be a termNatural between 0 and 255
 
 int termIsString(TERM *t) {
 	TERM *r;
@@ -607,7 +607,7 @@ int termIsString(TERM *t) {
 		// check for the form \s.s Head Tail
 		if(r->lterm->type == TM_APPL &&
 			r->lterm->lterm->type == TM_VAR &&
-			termNatural(r->lterm->rterm) >= 0 && termNatural(r->lterm->rterm) <= 127 &&
+			termNatural(r->lterm->rterm) >= 0 && termNatural(r->lterm->rterm) <= 255 &&
 			strcmp(r->lterm->lterm->name, t->lterm->name) == 0)
 			return termIsString(r->rterm);
 		break;
@@ -629,7 +629,7 @@ int termIsString(TERM *t) {
 
 // termPrintString
 //
-// Prints a term of the form [A, B, C, ...]. The term must be the encoding of a list
+// Prints a term of the form "ABC…". The term must have a nested-pair encoding;
 // (termIsString(t) must return 1).
 
 void termPrintString(TERM *t) {
