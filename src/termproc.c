@@ -658,22 +658,26 @@ int termIsList(TERM *t) {
     // match single-element list (necessary due to eta-reduction)
 	r = t->rterm;
 	if(r->type == TM_APPL &&
+	   (t->lterm && t->lterm->name) && (r && r->lterm && r->lterm->name) &&
 	   strcmp(t->lterm->name, r->lterm->name) == 0 &&
 	   r->rterm->type == TM_ABSTR) return 1;
 
 	char * c_name = t->lterm->name;
-	if(!(r->lterm) || !(r->lterm->name)) return 0;
+	if(!c_name || !(r->lterm) || !(r->lterm->name)) return 0;
 	char * n_name = r->lterm->name;
 
     r = r->rterm;
     while(r && r->type == TM_APPL) {
-        if(strcmp(r->lterm->lterm->name, c_name) == 0 && r->lterm->type == TM_APPL && r->lterm->rterm->type == TM_ABSTR) {
+        if((r && r->lterm && r->lterm->lterm && r->lterm->lterm->name && r->lterm->rterm) &&
+           strcmp(r->lterm->lterm->name, c_name) == 0 && r->lterm->type == TM_APPL && r->lterm->rterm->type == TM_ABSTR) {
             r = r->rterm;
             continue;
         }
 
         return 0;
     }
+
+    if(!r || !(r->name)) return 0;
 
     return strcmp(r->name, n_name) == 0;
 }
