@@ -59,7 +59,7 @@ void termPrint(TERM *t, int isMostRight) {
 
 	 case TM_ABSTR:
 		if(readable && termIdentity(t))
-		    putchar('I');
+		    putchar('1');
 		else if(readable && (num = termBoolean(t)) != -1)
 		    printf("%s", num ? "True" : "0");
 		else if(readable && (num = termNatural(t)) != -1)
