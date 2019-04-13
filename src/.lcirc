@@ -154,6 +154,9 @@ Pair = \x.\y.\z.z x y;
 Fst = \z.z True;
 Snd = \z.z False;
 
+Swap = \p.(Snd p), (Fst p);
+PairEq = \l.\r.((Fst l) == (Fst r)) && ((Snd l) == (Snd r));
+
 # --- String Manipulation ---------------------------------------------
 
 Empty = \x.True;
@@ -172,6 +175,13 @@ Index = \l.\n.Head (Drop (Pred n) l);
 
 Init  = \l.Reverse (Drop 1 (Reverse l));
 Last  = Compose Head Reverse;
+
+# --- Nested-Pairwise Dictionaries ------------------------------------
+
+Keys = Map Fst;
+Values = Map Snd;
+
+Lookup = \f.\l.Take 1 (Map Snd (Filter (\i.f (Fst i)) l));
 
 # --- Infinite recursion ----------------------------------------------
 
