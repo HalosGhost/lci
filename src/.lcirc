@@ -232,7 +232,7 @@ Replicate = \n.\e.n (':' e) Nil;
 Reverse = Foldl (Flip ':') Nil;
 Sum = Foldl '+' 0;
  
-Take = \n.\l.Reverse (Drop ((Length l) - n) (Reverse l));
+Take = Flip (Foldr (\x.\g.\n.(IsZero n) Nil (x : (g (Pred n)))) (True Nil));
 
 Zip = Foldr (\x.\z.\l.(IsNil l) Nil ((x, (Head l)) : (z (Tail l)))) (\t.False);
 
