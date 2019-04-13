@@ -32,12 +32,12 @@
 ? DefOp ','  55 xfx;   # Construct ordered pair (a,b)
 ? DefOp '..' 55 xfx;   # n..m = [n,n+1,...,m] (or [n, n-1,...,m])
 
-? DefOp '+'  50 yfx;   # Add
+? DefOp '+'  50 yfx;   # Plus
 ? DefOp '-'  50 yfx;   # Monus
 
-? DefOp '*'  40 yfx;   # Multiply
-? DefOp '/'  40 yfx;   # Integer division
-? DefOp '%'  40 yfx;   # Integer modulus
+? DefOp '*'  40 yfx;   # Times
+? DefOp '/'  40 yfx;   # Integer Divide
+? DefOp '%'  40 yfx;   # Integer Modulus
 
 ? DefOp '**' 35 yfx;   # Exponential
 
@@ -59,9 +59,9 @@
 '>=' = GE;
 '>' = GT;
 
-'+' = Add;
+'+' = Plus;
 '-' = Monus;
-'*' = Multiply;
+'*' = Times;
 '/' = Divide;
 '%' = Modulus;
 '**' = Power;
@@ -123,10 +123,10 @@ Scanl = \f.\z.\l.Reverse (Foldr (\g.\a.(f g (Head a)) : a) (z : Nil) (Reverse l)
 Succ = \n.\f.\x.n f (f x);
 Pred = \x.\y.\z.x (\p.\q.q (p y)) (\y.z) I;
 
-Add = \n.\m.\f.\x.n f (m f x);
+Plus = \n.\m.\f.\x.n f (m f x);
 Monus = \a.\b.b Pred a;
 
-Multiply = Compose;
+Times = Compose;
 Divide = \n.\m.Length (TakeWhile (\i.i <= n) (Scanl '+' m (Replicate (Succ n - m) m)));
 Modulus = \n.\m.n - (Last (TakeWhile (\i.i <= n) (Scanl '+' m (Replicate (Succ n - m) m))));
 
