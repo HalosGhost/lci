@@ -215,7 +215,7 @@ G = \n.
 # --- Basic list functions --------------------------------------------
 
 Append = Flip (Foldr ':');
-Combine = \l.\r.Zip (Concat (Map (Replicate (Length l)) l)) (Concat (Replicate (Length r) r));
+Combine = \l.\r.Concat (Map (\i.Map (\e.(e, i)) l) r);
 Concat = Foldr '++' Nil;
 Copy = Foldr ':' Nil;
 Drop = \n.n Tail;
