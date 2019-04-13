@@ -50,30 +50,3 @@ Check = \i.\j.\m.\n.
 	j   == n		||
 	i+j == m+n	||
 	i+n == m+j;
-
-
-
-# --- redefine basic funtions using ~ operator
-
-Map = \f.\l.
-	If (IsNil l)
-		Nil
-		(Cons (f ~ (Head l)) (Map f ~ (Tail l)));
-
-Filter = \f.\l.
-	If (IsNil l)
-		Nil
-		(If ~ (f ~ (Head l))
-			(Cons ~ (Head l) ~ (Filter f (Tail l)))
-			(Filter f (Tail l)));
-
-Combine = \l1.\l2.
-	If (IsNil l1)
-		Nil
-		(Append ~ (Map (Pair (Head l1)) l2) ~ (Combine (Tail l1) l2));
-
-All = \f.\l.
-	If (IsNil l)
-		True
-		(And (f ~ (Head l)) (All f ~ (Tail l)));
-
