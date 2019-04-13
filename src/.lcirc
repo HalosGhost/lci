@@ -155,7 +155,7 @@ Fst = \z.z True;
 Snd = \z.z False;
 
 Swap = \p.(Snd p), (Fst p);
-PairEq = \l.\r.((Fst l) == (Fst r)) && ((Snd l) == (Snd r));
+PairEq = \f.\l.\r.(f (Fst l) (Fst r)) && (f (Snd l) (Snd r));
 
 # --- String Manipulation ---------------------------------------------
 
@@ -221,9 +221,8 @@ Copy = Foldr ':' Nil;
 Drop = \n.n Tail;
 
 Length = Foldr (\c.\n.n + 1) 0;
-ListEq = \l.\r.((Length l) == (Length r)) (All (\p.(Fst p) == (Snd p)) (Zip l r)) False;
+ListEq = \f.\l.\r.((Length l) == (Length r)) (All (\p.f (Fst p) (Snd p)) (Zip l r)) False;
 Maximum = Foldr Max 0;
-Member = \e.Any ('==' e);
 Minimum = \l.Foldr Min (Head l) (Tail l);
 
 Product = Foldl '*' 1;
