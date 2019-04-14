@@ -176,7 +176,7 @@ Index = \l.\n.Head (Drop (Pred n) l);
 Init  = \l.Reverse (Drop 1 (Reverse l));
 Last  = Compose Head Reverse;
 
-# --- Nested-Pairwise Dictionaries ------------------------------------
+# --- Pairwise Dictionaries -------------------------------------------
 
 Keys = Map Fst;
 Values = Map Snd;
@@ -219,6 +219,7 @@ Append = Flip (Foldr ':');
 Combine = \l.\r.Concat (Map (\i.Map (\e.(e, i)) l) r);
 Concat = Foldr '++' Nil;
 Copy = Foldr ':' Nil;
+DeleteAt = \n.\l.Values (Filter (\p.(Fst p) != n) (Indexed l));
 Drop = \n.n Tail;
 
 Length = Foldr (\c.\n.Succ n) 0;
