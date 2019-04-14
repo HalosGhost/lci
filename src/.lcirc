@@ -181,6 +181,7 @@ Last  = Compose Head Reverse;
 Keys = Map Fst;
 Values = Map Snd;
 
+Indexed = \l.Foldr (\x.\c.\i.(i, x) : (c (Succ i))) (\n.Nil) l 1;
 Lookup = \f.\l.Take 1 (Map Snd (Filter (\i.f (Fst i)) l));
 
 # --- Infinite recursion ----------------------------------------------
@@ -220,7 +221,7 @@ Concat = Foldr '++' Nil;
 Copy = Foldr ':' Nil;
 Drop = \n.n Tail;
 
-Length = Foldr (\c.\n.n + 1) 0;
+Length = Foldr (\c.\n.Succ n) 0;
 ListEq = \f.\l.\r.((Length l) == (Length r)) (All (\p.f (Fst p) (Snd p)) (Zip l r)) False;
 Maximum = Foldr Max 0;
 Minimum = \l.Foldr Min (Head l) (Tail l);
