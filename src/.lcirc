@@ -236,7 +236,8 @@ Sum = Foldl '+' 0;
  
 Take = Flip (Foldr (\x.\g.\n.(IsZero n) Nil (x : (g (Pred n)))) (True Nil));
 
-Zip = Foldr (\x.\z.\l.(IsNil l) Nil ((x, (Head l)) : (z (Tail l)))) (\t.False);
+Zip = ZipWith ',';
+ZipWith = \f.Foldr (\x.\z.\l.(IsNil l) Nil ((f x (Head l)) : (z (Tail l)))) (\t.False);
 
 # --- High order functions --------------------------------------------
 
