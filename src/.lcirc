@@ -173,7 +173,7 @@ Head  = \p.p True False;
 Tail  = \l.\c.\n.l (\h.\t.\g.g h (t c)) (\t.n) False;
 Index = \l.\n.Head (Drop (Pred n) l);
 
-Init  = \l.Reverse (Drop 1 (Reverse l));
+Init  = \l.Reverse (Tail (Reverse l));
 Last  = Compose Head Reverse;
 
 # --- Pairwise Dictionaries -------------------------------------------
