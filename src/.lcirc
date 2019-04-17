@@ -127,8 +127,8 @@ Plus = \n.\m.\f.\x.n f (m f x);
 Monus = \a.\b.b Pred a;
 
 Times = Compose;
-Divide = \n.\m.Length (TakeWhile (\i.i <= n) (Scanl '+' m (Replicate (Succ n - m) m)));
-Modulus = \n.\m.n - (Last (TakeWhile (\i.i <= n) (Scanl '+' m (Replicate (Succ n - m) m))));
+Divide = \n.\m.Last (TakeWhile (\i.(i * m) <= n) (1..(Succ n - m)));
+Modulus = \n.\m.n - (Times m ~ (Divide n m));
 
 Power = \n.\m.m n;
 
