@@ -137,6 +137,10 @@ Factorial = \n.Product ~ (2..n);
 Min = \n.\m.(LE n m) n m;
 Max = \n.\m.(LE m n) n m;
 
+Order = \n.Pred (Foldr (\x.\g.\t.(n < (10 ** x)) 1 (Succ (g t))) 1 (0..n) 1);
+Digits = \n.Reverse (Map (\i.(n / (10 ** i)) % 10) ~ (0..(Pred ~ (Order n))));
+Show = \n.ToString ~ (Map ('+' 48) ~ (Digits n));
+
 # --- Comparison functions / Predicates -------------------------------
 
 IsZero = \n.n (\x.False) True;
