@@ -120,14 +120,14 @@ Scanl = \f.\z.\l.Reverse (Foldr (\g.\a.(f g (Head a)) : a) (z : Nil) (Reverse l)
 
 # --- Arithmetic functions --------------------------------------------
 
-Succ = \n.\f.\x.n f (f x);
-Pred = \x.\y.\z.x (\p.\q.q (p y)) (\y.z) I;
+Increment = \n.\f.\x.n f (f x);
+Decrement = \x.\y.\z.x (\p.\q.q (p y)) (\y.z) I;
 
 Plus = \n.\m.\f.\x.n f (m f x);
-Monus = \a.\b.b Pred a;
+Monus = \a.\b.b Decrement a;
 
 Times = Compose;
-Divide = \n.\m.Foldr (\x.\g.\t.(n < (x * m)) 0 (Succ (g t))) (\t.0) (Range 1 ~ (Succ n - m)) 1;
+Divide = \n.\m.Foldr (\x.\g.\t.(n < (x * m)) 0 (Increment (g t))) (\t.0) (Range 1 ~ (Increment n - m)) 1;
 Modulus = \n.\m.n - (Times m ~ (Divide n m));
 
 Power = \n.\m.m n;
@@ -137,8 +137,8 @@ Factorial = \n.Product ~ (2..n);
 Min = \n.\m.(LE n m) n m;
 Max = \n.\m.(GE n m) n m;
 
-Order = \n.Pred (Foldr (\x.\g.\t.(n < (10 ** x)) 1 (Succ (g t))) 1 (0..n) 1);
-Digits = \n.Reverse (Map (\i.(n / (10 ** i)) % 10) ~ (0..(Pred ~ (Order n))));
+Order = \n.Decrement (Foldr (\x.\g.\t.(n < (10 ** x)) 1 (Increment (g t))) 1 (0..n) 1);
+Digits = \n.Reverse (Map (\i.(n / (10 ** i)) % 10) ~ (0..(Decrement ~ (Order n))));
 Show = \n.ToString ~ (Map ('+' 48) ~ (Digits n));
 
 # --- Comparison functions / Predicates -------------------------------
@@ -175,7 +175,7 @@ IsNil = \p.p (\h.\t.False) True;
 
 Head  = \p.p True False;
 Tail  = \l.\c.\n.l (\h.\t.\g.g h (t c)) (\t.n) False;
-Index = \l.\n.Head (Drop (Pred n) l);
+Index = \l.\n.Head (Drop (Decrement n) l);
 
 Init  = \l.Reverse (Tail (Reverse l));
 Last  = Compose Head Reverse;
@@ -185,13 +185,13 @@ Last  = Compose Head Reverse;
 Keys = Map Fst;
 Values = Map Snd;
 
-Indexed = \l.Foldr (\x.\c.\i.(i, x) : (c (Succ i))) (\n.Nil) l 1;
+Indexed = \l.Foldr (\x.\c.\i.(i, x) : (c (Increment i))) (\n.Nil) l 1;
 Lookup = \f.\l.Take 1 (Map Snd (Filter (\i.f (Fst i)) l));
 
 # --- Infinite recursion ----------------------------------------------
 
 Loop = Loop;
-Nats = \n.n:(Nats (Succ n));
+Nats = \n.n:(Nats (Increment n));
 
 # --- Ackermann function ----------------------------------------------
 
@@ -205,7 +205,7 @@ Ack = \m.\n.
   );
 
 #using primitive recursion on high order function
-Ack2 = \p.(p (\a.\q.(a (q a 1))) Succ);
+Ack2 = \p.(p (\a.\q.(a (q a 1))) Increment);
 
 # --- Mutually recursive functions ------------------------------------
 
@@ -226,7 +226,7 @@ Copy = Foldr ':' Nil;
 DeleteAt = \n.\l.Values (Filter (\p.(Fst p) != n) (Indexed l));
 Drop = \n.n Tail;
 
-Length = Foldr (\c.\n.Succ n) 0;
+Length = Foldr (\c.\n.Increment n) 0;
 ListEq = \f.\l.\r.((Length l) == (Length r)) (All (\p.f (Fst p) (Snd p)) (Zip l r)) False;
 Maximum = Foldr Max 0;
 Minimum = \l.Foldr Min (Head l) (Tail l);
@@ -238,7 +238,7 @@ Replicate = \n.\e.n (':' e) Nil;
 Reverse = Foldl (Flip ':') Nil;
 Sum = Foldl '+' 0;
  
-Take = Flip (Foldr (\x.\g.\n.(IsZero n) Nil (x : (g (Pred n)))) (True Nil));
+Take = Flip (Foldr (\x.\g.\n.(IsZero n) Nil (x : (g (Decrement n)))) (True Nil));
 
 Zip = ZipWith ',';
 ZipWith = \f.Foldr (\x.\z.\l.(IsNil l) Nil ((f x (Head l)) : (z (Tail l)))) (\t.False);
