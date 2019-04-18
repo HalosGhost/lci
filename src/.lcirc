@@ -127,7 +127,7 @@ Plus = \n.\m.\f.\x.n f (m f x);
 Monus = \a.\b.b Pred a;
 
 Times = Compose;
-Divide = \n.\m.Last (TakeWhile (\i.(i * m) <= n) (1..(Succ n - m)));
+Divide = \n.\m.Foldr (\x.\g.\t.(n < (x * m)) 0 (Succ (g t))) (\t.0) (Range 1 ~ (Succ n - m)) 1;
 Modulus = \n.\m.n - (Times m ~ (Divide n m));
 
 Power = \n.\m.m n;
