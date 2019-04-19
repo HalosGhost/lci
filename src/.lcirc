@@ -134,9 +134,11 @@ Power = \n.\m.m n;
 
 Tetrate = \a.\n.n (Power a) 1;
 
-Hyper = \h.(LE h 1)
-    (\a.\b.b Increment ((IsZero h) 1 a))
-    (\a.\b.b ((Hyper (Decrement h)) a) ((GE h 3) 1 0));
+Hyper = \h.Foldr
+    (\e.\g.\l.(LE e 1)
+        (\a.\b.b Increment ((IsZero e) 1 a))
+        (\a.\b.b ((g (Tail l)) a) ((GE e 3) 1 0))
+    ) 0 (h..0) 0;
 
 Factorial = \n.Product ~ (2..n);
 
