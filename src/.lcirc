@@ -134,14 +134,9 @@ Power = \n.\m.m n;
 
 Tetrate = \a.\n.n (Power a) 1;
 
-Hyper = \h.
-    If (IsZero h) (
-        \x.\y.Increment y
-    )( If (h == 1) (
-        \x.\y.y Increment x
-    )(
-        \x.\y.y ((Hyper (Decrement h)) x) ((h > 2) 1 0)
-    ));
+Hyper = \h.(LE h 1)
+    (\a.\b.b Increment ((IsZero h) 1 a))
+    (\a.\b.b ((Hyper (Decrement h)) a) ((GE h 3) 1 0));
 
 Factorial = \n.Product ~ (2..n);
 
