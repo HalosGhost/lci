@@ -43,6 +43,8 @@ int termIsString(TERM *t);
 void termPrintString(TERM *t);
 int termIsPair(TERM *t);
 void termPrintPair(TERM *t);
+int termIsMaybe(TERM *t);
+void termPrintMaybe(TERM *t);
 int termIsList(TERM *t);
 void termPrintList(TERM *t);
 

@@ -183,10 +183,17 @@ IsNil = \p.p (\h.\t.False) True;
 
 Head  = \p.p True False;
 Tail  = \l.\c.\n.l (\h.\t.\g.g h (t c)) (\t.n) False;
-Index = \l.\n.Head (Drop (Decrement n) l);
+Index = \l.\n.Lookup ('==' n) (Indexed l);
 
 Init  = \l.Reverse (Tail (Reverse l));
 Last  = Compose Head Reverse;
+
+# --- Maybe -----------------------------------------------------------
+
+Nothing = Nil;
+Just = \i.i : Nothing;
+
+FromJust = Head;
 
 # --- Pairwise Dictionaries -------------------------------------------
 
@@ -240,7 +247,7 @@ Maximum = Foldr Max 0;
 Minimum = \l.Foldr Min (Head l) (Tail l);
 
 Product = Foldl '*' 1;
-Push = \e.\l.l ++ (e : Nil);
+Push = \e.\l.l ++ (Just e);
 Range = \n.\m.(n < m) (Scanl '+' n (Replicate (m - n) 1)) (Reverse (Scanl '+' m (Replicate (n - m) 1)));
 Replicate = \n.\e.n (':' e) Nil;
 Reverse = Foldl (Flip ':') Nil;

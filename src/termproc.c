@@ -68,6 +68,8 @@ void termPrint(TERM *t, int isMostRight) {
 			termPrintString(t);
 		else if(readable && termIsPair(t))
 			termPrintPair(t);
+		else if(readable && termIsMaybe(t))
+			termPrintMaybe(t);
 		else if(readable && termIsList(t))
 			termPrintList(t);
 		else {
@@ -642,6 +644,42 @@ void termPrintString(TERM *t) {
 	}
 
     putchar('"');
+}
+
+// termIsMaybe
+//
+// Returns 1 if t is an encoding of a Maybe (a single-element list)
+
+int termIsMaybe(TERM *t) {
+	TERM *r;
+
+	if(t->type != TM_ABSTR) return 0;
+
+	r = t->rterm;
+	return
+	   // match Nothing
+	   (termBoolean(t) == 0) ||
+
+       // match Just N
+	   (r->type == TM_APPL &&
+	   (t->lterm && t->lterm->name) && (r && r->lterm && r->lterm->name) &&
+	   strcmp(t->lterm->name, r->lterm->name) == 0 &&
+	   r->rterm->type == TM_ABSTR);
+}
+
+// termPrintMaybe
+//
+// Prints a term of the form Just A. The term must be the encoding of a Maybe
+// (termIsMaybe(t) must return 1).
+
+void termPrintMaybe(TERM *t) {
+	TERM *r = t->rterm;
+	if(termBoolean(t) == 0)
+        fputs("Nothing", stdout);
+	else {
+        fputs("Just ", stdout);
+        termPrint(t->rterm->rterm, 1);
+    }
 }
 
 // termIsList
