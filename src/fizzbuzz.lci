@@ -1,0 +1,25 @@
+
+# queens.lci
+#
+# Implementation of fizzbuzz problem
+# Experimental use of ~ operator to use call-by-value.
+#
+# Usage: FizzBuzz <no>
+# Returns the list of strings corresponding to the answer from 1 to <no>
+# Performs reasonably well up to around 15
+
+Fizz = (70 : 105 : 122 : 122 : Nil);
+Buzz = (66 : 117 : 122 : 122 : Nil);
+
+FzBz = \n.
+    If (IsZero (n % 15)) (
+        ToString ~ (Fizz ++ Buzz)
+    ) (If (IsZero (n % 5)) (
+        ToString ~ Buzz
+    ) (If (IsZero (n % 3)) (
+        ToString ~ Fizz
+    ) (
+        Show n
+    )));
+
+FizzBuzz = \n.Map FzBz ~ (1..n);
