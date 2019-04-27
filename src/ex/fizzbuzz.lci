@@ -1,5 +1,5 @@
 
-# queens.lci
+# fizzbuzz.lci
 #
 # Implementation of fizzbuzz problem
 # Experimental use of ~ operator to use call-by-value.
