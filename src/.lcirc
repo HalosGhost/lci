@@ -256,7 +256,6 @@ Sum = Foldl '+' 0;
 Take = Flip (Foldr (\x.\g.\n.(IsZero n) Nil (x : (g (Decrement n)))) (True Nil));
 
 Zip = ZipWith ',';
-ZipWith = \f.Foldr (\x.\z.\l.(IsNil l) Nil ((f x (Head l)) : (z (Tail l)))) (\t.False);
 
 # --- High order functions --------------------------------------------
 
@@ -268,3 +267,5 @@ Filter = \f.Foldr (\h.\t.((Compose (\p.p ':' Nil) f) h) h t) Nil;
 Map = \f.Foldr (Compose ':' f) Nil;
 
 TakeWhile = \f.Foldr ((\p.\x.\t.(p x) (x : t) Nil) f) Nil;
+
+ZipWith = \f.Foldr (\x.\z.\l.(IsNil l) Nil ((f x (Head l)) : (z (Tail l)))) (\t.False);
