@@ -111,7 +111,10 @@ Nxor = \x.\y.Not (Xor x y);
 # --- Control-Flow Sugar ----------------------------------------------
 
 If = I;
+Repeat = I;
+Switch = \n.n (\i.\d.\b.\r.i (b (K (d r)) d)) I 1;
 
+# only used to give us the typical argument-order
 Foldr = \f.\z.\l.l f z;
 Foldl = \f.\z.\l.Foldr (\x.\g.\a.g (f a x)) (\x.x) l z;
 
@@ -131,6 +134,7 @@ Divide = \n.\m.Foldr (\x.\g.\t.(n < (x * m)) 0 (Increment (g t))) (\t.0) (Range 
 Modulus = \n.\m.n - (Times m ~ (Divide n m));
 
 Power = \n.\m.m n;
+Log = \b.\n.Last (TakeWhile (\e.(b ** e) <= n) (1..n));
 
 Tetrate = \a.\n.n (Power a) 1;
 
@@ -140,13 +144,14 @@ Hyper = \h.Foldr
         (\a.\b.b ((g (Tail l)) a) ((GE e 3) 1 0))
     ) 0 (h..0) 0;
 
+Triangle = \n.(n / 2) * (n + 1);
 Factorial = \n.Product ~ (2..n);
 
 Min = \n.\m.(LE n m) n m;
 Max = \n.\m.(GE n m) n m;
 
 Order = \n.Decrement (Foldr (\x.\g.\t.(n < (10 ** x)) 1 (Increment (g t))) 1 (0..n) 1);
-Digits = \n.Reverse (Map (\i.(n / (10 ** i)) % 10) ~ (0..(Decrement ~ (Order n))));
+Digits = \n.Reverse (Map (\i.(n / (10 ** i)) % 10) ~ (0..(Decrement ~ (Increment (Log 10 n)))));
 Show = \n.ToString ~ (Map ('+' 48) ~ (Digits n));
 
 # --- Comparison functions / Predicates -------------------------------
@@ -205,8 +210,10 @@ Lookup = \f.\l.Take 1 (Map Snd (Filter (\i.f (Fst i)) l));
 
 # --- Infinite recursion ----------------------------------------------
 
+Stream = Theta \f.\g.\i.\p.(Not (p i)) Nil (Cons i (f g (g i) p));
+
 Loop = Loop;
-Nats = \n.n:(Nats (Increment n));
+Nats = \t.Stream Increment 0 (\x.LE x t);
 
 # --- Ackermann function ----------------------------------------------
 
