@@ -26,7 +26,7 @@ Qu = \m.\qlist.
 			~ (Filter
 				(\p.Safe ~ (Fst p) ~ (Snd p) m)
 				~ (Combine
-					~ (Qu ~ (Pred m) qlist)
+					~ (Qu ~ (Decrement m) qlist)
 					qlist
 				)
 			)
