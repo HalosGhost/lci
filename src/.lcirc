@@ -101,6 +101,8 @@ True = K;
 False = 0;
 Not = \z.z False True;
 
+ToInt = \b.b 1 0;
+
 And = \x.\y.x y x;
 Or = \x.\y.x x y;
 Xor = \x.\y.x (Not y) y;
@@ -151,12 +153,16 @@ Min = \n.\m.(LE n m) n m;
 Max = \n.\m.(GE n m) n m;
 
 Order = \n.Decrement (Foldr (\x.\g.\t.(n < (10 ** x)) 1 (Increment (g t))) 1 (0..n) 1);
-Digits = \n.Reverse (Map (\i.(n / (10 ** i)) % 10) ~ (0..(Decrement ~ (Increment (Log 10 n)))));
-Show = \n.ToString ~ (Map ('+' 48) ~ (Digits n));
+
+NumDigits = \x.Length (TakeWhile (\n.(n 10) <= x) ~ (0..10));
+Digits = \n.Reverse (Map (\i.(n / (10 ** i)) % 10) ~ (0..(Decrement (NumDigits n))));
 
 # --- Comparison functions / Predicates -------------------------------
 
 IsZero = \n.n (\x.False) True;
+
+IsEven = \n.(n % 2) == 0;
+IsOdd = Compose Not IsEven;
 
 LT = \a.\b.Not (GE a b);
 LE = \a.\b.IsZero (Monus a b);
@@ -178,6 +184,8 @@ PairEq = \f.\l.\r.(f (Fst l) (Fst r)) && (f (Snd l) (Snd r));
 
 Empty = \x.True;
 ToString = Foldr ',' Empty;
+
+Show = \n.ToString ~ (Map ('+' 48) ~ (Digits n));
 
 # --- List Construction and Elimination -------------------------------
 
