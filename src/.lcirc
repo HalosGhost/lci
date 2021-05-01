@@ -261,13 +261,14 @@ ListEq = \f.\l.\r.((Length l) == (Length r)) (All (\p.f (Fst p) (Snd p)) (Zip l 
 Maximum = Foldr Max 0;
 Minimum = \l.Foldr Min (Head l) (Tail l);
 
+Sum = Foldl '+' 0;
 Product = Foldl '*' 1;
+
 Push = \e.\l.l ++ (Just e);
 Range = \n.\m.(n < m) (Scanl '+' n (Replicate (m - n) 1)) (Reverse (Scanl '+' m (Replicate (n - m) 1)));
 RangeStep = \n.\m.\s.(n < m) (TakeWhile (\i.i <= m) (Scanl '+' n (Replicate (m - n) s))) (TakeWhile (\i.i <= n) (Reverse (Scanl '+' m (Replicate (n - m) s))));
 Replicate = \n.\e.n (':' e) Nil;
 Reverse = Foldl (Flip ':') Nil;
-Sum = Foldl '+' 0;
  
 Take = Flip (Foldr (\x.\g.\n.(IsZero n) Nil (x : (g (Decrement n)))) (True Nil));
 
