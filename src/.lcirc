@@ -196,7 +196,7 @@ IsNil = \p.p (\h.\t.False) True;
 
 Head  = \p.p True False;
 Tail  = \l.\c.\n.l (\h.\t.\g.g h (t c)) (\t.n) False;
-Index = \l.\n.Lookup ('==' n) (Indexed l);
+Index = \l.\n.Take 1 ((Drop (Decrement n)) l);
 
 Init  = \l.Reverse (Tail (Reverse l));
 Last  = Compose Head Reverse;
